@@ -1,0 +1,59 @@
+﻿
+
+namespace ZeroNull.Types.Option
+{
+    using System;
+
+    /// <summary>
+    /// Represents an optional value that can be either Some (has a value) or None (missing).
+    /// </summary>
+    public readonly struct Option<T>
+    {
+        private readonly T _value;
+        private readonly bool _hasValue;
+
+        private Option(T value, bool hasValue)
+        {
+            _value = value;
+            _hasValue = hasValue;
+        }
+
+        public static Option<T> Some(T value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+            return new Option<T>(value, true);
+        }
+
+        public static Option<T> None() => new Option<T>(default!, false);
+
+        public bool IsSome => _hasValue;
+        public bool IsNone => !_hasValue;
+
+        public T Value =>
+            IsSome ? _value! : throw new InvalidOperationException("Option has no value.");
+
+        // Core functional methods
+        public Option<U> Map<U>(Func<T, U> mapper) =>
+            IsSome ? Option<U>.Some(mapper(_value!)) : Option<U>.None();
+
+        public Option<U> Bind<U>(Func<T, Option<U>> binder) =>
+            IsSome ? binder(_value!) : Option<U>.None();
+
+        public T ValueOr(T fallback) => IsSome ? _value! : fallback;
+
+        public T ValueOr(Func<T> fallbackFactory) =>
+            IsSome ? _value! : fallbackFactory();
+
+        // Exhaustive matching
+        public TResult Match<TResult>(Func<T, TResult> some, Func<TResult> none) =>
+            IsSome ? some(_value!) : none();
+
+        // LINQ support (optional but nice)
+        public Option<U> Select<U>(Func<T, U> mapper) => Map(mapper);
+        public Option<V> SelectMany<U, V>(Func<T, Option<U>> bind, Func<T, U, V> project)
+        {
+            return Bind(x => bind(x).Map(y => project(x, y)));
+        }
+    }
+}
