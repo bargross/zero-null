@@ -1,6 +1,7 @@
-﻿using ZeroNull.Types.Either.Root;
-using ZeroNull.Types.Either.Rule;
+﻿using System.Collections.Generic;
 using ZeroNull.Exceptions;
+using ZeroNull.Types.Either.Root;
+using ZeroNull.Types.Either.Rule;
 
 namespace ZeroNull.Types.Either
 {
@@ -15,6 +16,29 @@ namespace ZeroNull.Types.Either
 
         public bool IsValid { get; private set; }
         public bool IsPresent { get; private set;  }
+        public bool IsLeft => _isLeft;
+
+        public TRight Right
+        {
+            get
+            {
+                if (_root.Right == null)
+                    throw new ArgumentNullException(nameof(Right));
+
+                return _root.Right;
+            }
+        }
+
+        public TLeft Left
+        {
+            get
+            {
+                if (_root.Right == null)
+                    throw new ArgumentNullException(nameof(Left));
+
+                return _root.Left;
+            }
+        }
 
         public bool IsLeftValid
         {
@@ -135,7 +159,7 @@ namespace ZeroNull.Types.Either
         
         public static Either<TLeft, TRight> Of(TLeft value) => new Either<TLeft, TRight>(value, _ruleValidator);
         public static Either<TLeft, TRight> Of(TRight value) => new Either<TLeft, TRight>(value, _ruleValidator);
-        
+
         // private methods
 
         private void AssignScopeValues(Type type, bool isLeft, bool isPresent, bool isValid)
