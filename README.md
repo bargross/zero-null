@@ -1,4 +1,4 @@
-[![NuGet](https://img.shields.io/nuget/v/ZeroNull)](https://www.nuget.org/packages/ZeroNull)
+[![NuGet](https://img.shields.io/nuget/v/ZeroNull?cacheSeconds=0)](https://www.nuget.org/packages/ZeroNull)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
  
  # ZeroNull
