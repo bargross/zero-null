@@ -25,7 +25,7 @@ jobs:
         echo "Root directory contents:"
         ls -la
         echo ""
-        echo "Altered directory contents:"
+        echo "ZeroNull directory contents:"
         ls -la ./ZeroNull
         echo ""
         echo "Looking for .sln files:"
@@ -65,17 +65,42 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
+    - name: Display tag version
+      run: echo "Tag version = ${GITHUB_REF#refs/tags/v}"
+
+    - name: Debug – find csproj file
+      run: find . -name "*.csproj" -type f
+      shell: bash
+
     - name: Pack NuGet package
       run: |
-        dotnet pack ./ZeroNull/ZeroNull/ZeroNull.csproj \
+        dotnet pack ZeroNull/ZeroNull/ZeroNull.csproj \
           --configuration Release \
           --output ./nupkgs \
-          -p:PackageVersion=${GITHUB_REF#refs/tags/v}
-      working-directory: ./
+          -p:PackageVersion="${GITHUB_REF#refs/tags/v}" \
+          -p:IncludeSymbols=false \
+          -p:IncludeSource=false
+      shell: bash
+
+    - name: List nupkg files
+      run: |
+        echo "Contents of ./nupkgs:"
+        ls -la ./nupkgs || echo "Directory does not exist or is empty"
+      shell: bash
 
     - name: Push to NuGet.org
       run: |
-        dotnet nuget push ./nupkgs/*.nupkg \
-          --api-key ${{ secrets.NUGET_API_KEY }} \
-          --source https://api.nuget.org/v3/index.json \
-          --skip-duplicate
+        # Loop to push each .nupkg file found
+        for pkg in ./nupkgs/*.nupkg; do
+          if [ -f "$pkg" ]; then
+            echo "Pushing $pkg"
+            dotnet nuget push "$pkg" \
+              --api-key ${{ secrets.NUGET_API_KEY }} \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          else
+            echo "No .nupkg files found in ./nupkgs/"
+            exit 1
+          fi
+        done
+      shell: bash
