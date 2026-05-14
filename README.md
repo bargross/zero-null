@@ -152,3 +152,45 @@ ageResult.Match(
 );
 // Output: Validation error: Age must be between 0 and 120
 ```
+
+## Roadmap / Future Features
+
+This library is actively evolving. Below are the planned types and capabilities for future releases.
+
+### Phase 1: Core Enhancements (v2.0)
+
+| Feature | Description |
+| :--- | :--- |
+| **Validation Builder** | Accumulate multiple errors during complex validation (like an applicative `Result`). |
+| **`NonEmptyList<T>`** | A compile-time guarantee that a collection has at least one element. |
+| **`Try<T>`** | A specialized `Result<T, Exception>` for safely executing exception‑throwing code. |
+| **`Unit` type** | Represents a void return, enabling generic monadic code. |
+| **Async variants** | `OptionAsync<T>`, `ResultAsync<T,TError>`, `EitherAsync<TLeft,TRight>` with LINQ support. |
+| **IEnumerable interop** | `.ToOption()`, `.ToResult()`, `.ToEnumerable()` extensions. |
+| **Discriminated Union source generator** | Generate exhaustive matching for sum types via a simple attribute. |
+
+### Phase 2: Advanced Control‑Flow Monads (v3.0)
+
+| Type | Purpose |
+| :--- | :--- |
+| **`Reader<TEnv, T>`** | Share read‑only environment (config, context) implicitly through a computation. |
+| **`Writer<TLog, T>`** | Accumulate a log (strings, metrics, etc.) alongside the main result. |
+| **`State<TState, T>`** | Pure, functional state transitions without `ref` or `out` parameters. |
+| **Monad Transformers** | Combine effects, e.g., `OptionT<Result<...>>` – computations that can fail, log, or read state simultaneously. |
+
+### Phase 3: Interoperability & Polish (v3.x / v4.0)
+
+| Feature | Description |
+| :--- | :--- |
+| **Task / ValueTask integration** | Seamless conversion between `Task<T>` and `Result<T, TError>`. |
+| **Standard interfaces** | Implement `IEquatable<T>`, `IComparable<T>`, and `System.Text.Json` converters for all types. |
+| **High‑performance optimizations** | Ensure all types remain `readonly struct` with zero heap allocation. |
+| **Source‑generated matching** | For DUs and sum types, generate exhaustive `Match` and `Switch` methods at compile time. |
+
+### Release Timeline
+
+- **v2.0** – Phase 1 features (Validation, `NonEmptyList`, `Try`, `Unit`, async variants, interop).
+- **v3.0** – Phase 2 monads (`Reader`, `Writer`, `State`, transformers).
+- **v3.x / v4.0** – Phase 3 interoperability and performance.
+
+Contributions and feedback are welcome! If you have a specific feature request, please open an issue.
