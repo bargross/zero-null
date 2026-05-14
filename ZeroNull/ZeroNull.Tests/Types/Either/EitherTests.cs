@@ -1,6 +1,6 @@
 using ZeroNull.Types.Either;
 
-namespace ZeroNull.Tests.Types
+namespace ZeroNull.Tests.Types.Either
 {
     public class EitherTests
     {

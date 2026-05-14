@@ -1,6 +1,6 @@
 using ZeroNull.Types.Either.Rule;
 
-namespace ZeroNull.Tests.Types.Rule
+namespace ZeroNull.Tests.Types.Either.Rule
 {
     public class RuleValidatorTests
     {

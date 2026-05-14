@@ -34,27 +34,48 @@ namespace ZeroNull.Types.Result
             IsError ? _error! : throw new InvalidOperationException("Cannot access error of a success result.");
 
         // Core functional methods
-        public Result<U, TError> Map<U>(Func<T, U> mapper) =>
-            IsOk ? Result<U, TError>.Ok(mapper(_value!)) : Result<U, TError>.Error(_error!);
+        public Result<U, TError> Map<U>(Func<T, U> mapper)
+        {
+            if (mapper == null) throw new ArgumentNullException(nameof(mapper));
 
-        public Result<U, TError> Bind<U>(Func<T, Result<U, TError>> binder) =>
-            IsOk ? binder(_value!) : Result<U, TError>.Error(_error!);
+            return IsOk ? Result<U, TError>.Ok(mapper(_value!)) : Result<U, TError>.Error(_error!);
+        }
 
-        public Result<T, TError2> MapError<TError2>(Func<TError, TError2> mapper) =>
-            IsError ? Result<T, TError2>.Error(mapper(_error!)) : Result<T, TError2>.Ok(_value!);
+        public Result<U, TError> Bind<U>(Func<T, Result<U, TError>> binder)
+        {
+            if (binder == null) throw new ArgumentNullException(nameof(binder));
+
+            return IsOk ? binder(_value!) : Result<U, TError>.Error(_error!);
+        }
+
+        public Result<T, TError2> MapError<TError2>(Func<TError, TError2> mapper)
+        {
+            if (mapper == null) throw new ArgumentNullException(nameof(mapper));
+
+            return IsError ? Result<T, TError2>.Error(mapper(_error!)) : Result<T, TError2>.Ok(_value!);
+        }
 
         public T ValueOr(T fallback) => IsOk ? _value! : fallback;
 
         // Exhaustive matching
-        public TResult Match<TResult>(Func<T, TResult> ok, Func<TError, TResult> error) =>
-            IsOk ? ok(_value!) : error(_error!);
+        public TResult Match<TResult>(Func<T, TResult> ok, Func<TError, TResult> error)
+        {
+            if (ok == null) throw new ArgumentNullException(nameof(ok));
+            if (error == null) throw new ArgumentNullException(nameof(error));
+
+            return IsOk ? ok(_value!) : error(_error!);
+        }
 
         // LINQ support
         public Result<U, TError> Select<U>(Func<T, U> mapper) => Map(mapper);
+
         public Result<V, TError> SelectMany<U, V>(
             Func<T, Result<U, TError>> bind,
             Func<T, U, V> project)
         {
+            if (bind == null) throw new ArgumentNullException(nameof(bind));
+            if (project == null) throw new ArgumentNullException(nameof(project));
+
             return Bind(x => bind(x).Map(y => project(x, y)));
         }
     }
