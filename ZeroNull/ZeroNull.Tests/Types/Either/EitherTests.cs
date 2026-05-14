@@ -4,234 +4,171 @@ namespace ZeroNull.Tests.Types.Either
 {
     public class EitherTests
     {
-        private Either<string, int> _either;
-
-        public EitherTests()
+        [Fact]
+        public void Of_WithLeftValue_CreatesLeftEither()
         {
-            _either = new Either<string, int>();
-        }
-
-        [Fact(Skip = "Invalid test as the visibility of rule validator is internal only, disabled until i change strategy")]
-        public void SetValidatorOptions_RuleNameNotProvidedForLeft_ThrowsArgumentExcption()
-        {
-            Assert.Throws<ArgumentException>(() => {
-                //_either.SetValidatorOptions(options => options.AddRule(null, value => !string.IsNullOrWhiteSpace(value)) );
-            });
-        }
-
-        [Fact(Skip = "Invalid test as the visibility of rule validator is internal only, disabled until i change strategy")]
-        public void SetValidatorOptions_RuleNameNotProvidedForRight_ThrowsArgumentExcption()
-        {
-            Assert.Throws<ArgumentException>(() => {
-                //_either.SetValidatorOptions(options => options.AddRule(null, value => value > 0 && value < 10));
-            });
+            var either = Either<string, int>.Of("error");
+            Assert.True(either.IsLeft);
+            Assert.False(!either.IsLeft); // IsRight
+            Assert.Equal("error", either.Left);
         }
 
         [Fact]
-        public void ContainsRule_RuleNameNotProvided_ReturnsFalse() => Assert.False(_either.ContainsRule("A"));
-
-        [Fact(Skip = "Invalid test as the visibility of rule validator is internal only, disabled until i change strategy")]
-        public void ContainsRule_RuleNameProvided_ReturnsTrue()
+        public void Of_WithRightValue_CreatesRightEither()
         {
-            var ruleName = "A";
-            //_either.SetValidatorOptions( options => options.AddRule(ruleName, value => value == ruleName));
-
-            var result = _either.ContainsRule(ruleName);
-
-            Assert.True(result);
-        }
-
-        [Fact(Skip = "Invalid test as the visibility of rule validator is internal only, disabled until i change strategy")]
-        public void SetValidatorOptions_RuleProvidedForLeft_ValidatorContainsRule()
-        {
-            var ruleName = "B";
-
-            //_either.SetValidatorOptions( options => {
-            //    options.AddRule(ruleName, value => !string.IsNullOrWhiteSpace(value));
-            //});
-
-            Assert.True(_either.ContainsRule(ruleName));
-        }
-
-        [Fact(Skip = "Invalid test as the visibility of rule validator is internal only, disabled until i change strategy")]
-        public void SetValidatorOptions_RuleProvidedForRight_ValidatorContainsRule()
-        {
-            var ruleName = "B";
-
-            //_either.SetValidatorOptions(options => {
-            //    options.AddRule(ruleName, value => value > 0 && value < 10);
-            //});
-
-            Assert.True(_either.ContainsRule(ruleName));
+            var either = Either<string, int>.Of(42);
+            Assert.False(either.IsLeft);
+            Assert.True(!either.IsLeft); // IsRight
+            Assert.Equal(42, either.Right);
         }
 
         [Fact]
-        public void GetValue_RuleProvidedForLeftWithValueOutsideOfBounds_ThrowsInvalidCastException()
+        public void ImplicitOperator_FromLeft_CreatesLeftEither()
         {
-            _either = " ";
-
-            Assert.Throws<InvalidCastException>(() => _either.GetValue<int>());
+            Either<string, int> either = "error";
+            Assert.True(either.IsLeft);
+            Assert.Equal("error", either.Left);
         }
 
         [Fact]
-        public void GetValue_RuleProvidedForRightWithValueOutsideOfBounds_ThrowsInvalidCastException()
+        public void ImplicitOperator_FromRight_CreatesRightEither()
         {
-            _either = 11;
-
-            Assert.Throws<InvalidCastException>(() => _either.GetValue<string>());
-        }
-
-        [Fact(Skip = "Invalid test as the visibility of rule validator is internal only, disabled until i change strategy")]
-        public void GetValue_RuleProvidedForLeftWithValueOutsideOfBounds_ThrowsRuleValidationException()
-        {
-            var invalidValue = " ";
-            var ruleName = "A";
-
-            //_either.SetValidatorOptions(options => {
-            //    options.TerminateOnFail = true;
-            //    options.AddRule(ruleName, value => !string.IsNullOrWhiteSpace(value));
-            //});
-
-            //_either = invalidValue;
-
-            //Assert.Throws<RuleValidationException>(() => _either.GetValue<string>());
-            Assert.False(_either.GetValidationResultForRule(ruleName));
-            Assert.False(_either.IsValid);
-        }
-
-        [Fact(Skip = "Invalid test as the visibility of rule validator is internal only, disabled until i change strategy")]
-        public void GetValue_RuleProvidedForRightWithValueOutsideOfBounds_ThrowsRuleValidationException()
-        {
-            var invalidValue = 11;
-            var ruleName = "A";
-
-            //_either.SetValidatorOptions(options => {
-            //    options.TerminateOnFail = true;
-            //    options.AddRule(ruleName, value => value >= 0 && value <= 10);
-            //});
-
-            //_either = invalidValue;
-
-            //Assert.Throws<RuleValidationException>(() => _either.GetValue<int>());
-            Assert.False(_either.GetValidationResultForRule(ruleName));
-            Assert.False(_either.IsValid);
-        }
-
-        [Fact(Skip = "Invalid test as the visibility of rule validator is internal only, disabled until i change strategy")]
-        public void GetValue_RuleProvidedForLeftWithValueBetweenOfBounds_ReturnsLeftValue()
-        {
-            var expected = "Valid String";
-            var ruleName = "A";
-
-            //_either.SetValidatorOptions(options => {
-            //    options.TerminateOnFail = true;
-            //    options.AddRule(ruleName, value => !string.IsNullOrWhiteSpace(value));
-            //});
-
-            _either = expected;
-
-            Assert.True(_either.GetValidationResultForRule(ruleName));
-            Assert.True(_either.IsValid);
-            Assert.True(_either.ContainsRule(ruleName));
-            Assert.Equal(expected, _either.GetValue<string>());
-        }
-
-        [Fact(Skip = "Invalid test as the visibility of rule validator is internal only, disabled until i change strategy")]
-        public void GetValue_RuleProvidedForRightWithValueBetweenOfBounds_ReturnsRightValue()
-        {
-            var expected = 10;
-            var ruleName = "A";
-
-            //_either.SetValidatorOptions(options => {
-            //    options.TerminateOnFail = true;
-            //    options.AddRule(ruleName, value => value >= 0 && value <= 10);
-            //});
-
-            _either = expected;
-
-            Assert.True(_either.GetValidationResultForRule(ruleName));
-            Assert.True(_either.IsValid);
-            Assert.True(_either.ContainsRule(ruleName));
-            Assert.Equal(expected, _either.GetValue<int>());
+            Either<string, int> either = 42;
+            Assert.False(either.IsLeft);
+            Assert.Equal(42, either.Right);
         }
 
         [Fact]
-        public void ImplicitOperatorTLeft_ValidLeftValueProvided_CastsEitherToTLeft()
+        public void Left_WhenLeft_ReturnsValue()
         {
-            var expected = "bla";
-            _either = expected;
-
-            var result = (string)_either;
-
-            Assert.True(_either.IsPresent);
-            Assert.True(_either.IsValid);
-            Assert.Equal(expected, result);
+            var either = Either<string, int>.Of("test");
+            Assert.Equal("test", either.Left);
         }
 
         [Fact]
-        public void ImplicitOperatorTRight_ValidRightValueProvided_CastsEitherToTRight()
+        public void Left_WhenRight_ThrowsInvalidOperationException()
         {
-            var expected = 123123;
-            _either = expected;
-
-            var result = (int)_either;
-
-            Assert.True(_either.IsPresent);
-            Assert.True(_either.IsValid);
-            Assert.Equal(expected, result);
+            var either = Either<string, int>.Of(42);
+            Assert.Throws<InvalidOperationException>(() => either.Left);
         }
 
-        [Fact(Skip = "Invalid test as the visibility of rule validator is internal only, disabled until i change strategy")]
-        public void ReplaceRule_NewRuleGivenToReplaceOldRule_ReplacesRuleForRight()
+        [Fact]
+        public void Right_WhenRight_ReturnsValue()
         {
-            var ruleName = "C";
-
-            //_either.SetValidatorOptions(options => options.AddRule(ruleName, value => value == ruleName));
-
-            _either.ReplaceRule(ruleName, value => value == 1);
-            _either = 1;
-
-            Assert.True(_either.ContainsRule(ruleName));
-            Assert.True(_either.IsValid);
+            var either = Either<string, int>.Of(99);
+            Assert.Equal(99, either.Right);
         }
 
-        [Fact(Skip = "Invalid test as the visibility of rule validator is internal only, disabled until i change strategy")]
-        public void ReplaceRule_NewRuleGivenToReplaceOldRule_ReplacesRuleForLeft()
+        [Fact]
+        public void Right_WhenLeft_ThrowsInvalidOperationException()
         {
-            var ruleName = "C";
-
-            //_either.SetValidatorOptions(options => options.AddRule(ruleName, value => value == 1));
-
-            _either.ReplaceRule(ruleName, value => value == ruleName);
-            _either = ruleName;
-
-            Assert.True(_either.ContainsRule(ruleName));
-            Assert.True(_either.IsValid);
+            var either = Either<string, int>.Of("error");
+            Assert.Throws<InvalidOperationException>(() => either.Right);
         }
 
-        [Fact(Skip = "Invalid test as the visibility of rule validator is internal only, disabled until i change strategy")]
-        public void ResetRules_RulesProvidedForLeftAndRight_RulesAreCleared()
+        [Fact]
+        public void GetValue_WithMatchingType_WhenLeft_ReturnsLeftValue()
         {
-            var ruleNameLeft = "A";
-            var ruleNameRight = "B";
+            var either = Either<string, int>.Of("hello");
+            var value = either.GetValue<string>();
+            Assert.Equal("hello", value);
+        }
 
-            //_either.SetValidatorOptions(options => {
-            //    options.AddRule(ruleNameLeft, value => value == ruleNameRight)
-            //    .AddRule(ruleNameRight, value => value > 1);
-            //});
+        [Fact]
+        public void GetValue_WithMatchingType_WhenRight_ReturnsRightValue()
+        {
+            var either = Either<string, int>.Of(123);
+            var value = either.GetValue<int>();
+            Assert.Equal(123, value);
+        }
 
-            var leftRuleBeforeClearing = _either.ContainsRule(ruleNameLeft);
-            var rightRuleBeforeClearing = _either.ContainsRule(ruleNameRight);
+        [Fact]
+        public void GetValue_WithNonMatchingType_ThrowsInvalidCastException()
+        {
+            var either = Either<string, int>.Of("test");
+            Assert.Throws<InvalidCastException>(() => either.GetValue<int>());
+        }
 
-            _either.ResetRules();
+        [Fact]
+        public void GetValue_WithWrongSideType_ThrowsInvalidCastException()
+        {
+            var either = Either<string, int>.Of(42);
+            Assert.Throws<InvalidCastException>(() => either.GetValue<string>());
+        }
 
-            var resultForLeft = _either.ContainsRule(ruleNameLeft);
-            var resultForRight = _either.ContainsRule(ruleNameRight);
+        [Fact]
+        public void ExplicitCast_ToLeftType_WhenLeft_ReturnsValue()
+        {
+            var either = Either<string, int>.Of("cast");
+            string value = (string)either;
+            Assert.Equal("cast", value);
+        }
 
-            Assert.True(leftRuleBeforeClearing);
-            Assert.True(rightRuleBeforeClearing);
-            Assert.False(resultForLeft);
-            Assert.False(resultForRight);
+        [Fact]
+        public void ExplicitCast_ToLeftType_WhenRight_ThrowsInvalidCastException()
+        {
+            var either = Either<string, int>.Of(5);
+            Assert.Throws<InvalidCastException>(() => (string)either);
+        }
+
+        [Fact]
+        public void ExplicitCast_ToRightType_WhenRight_ReturnsValue()
+        {
+            var either = Either<string, int>.Of(100);
+            int value = (int)either;
+            Assert.Equal(100, value);
+        }
+
+        [Fact]
+        public void ExplicitCast_ToRightType_WhenLeft_ThrowsInvalidCastException()
+        {
+            var either = Either<string, int>.Of("error");
+            Assert.Throws<InvalidCastException>(() => (int)either);
+        }
+
+        [Fact]
+        public void Of_WithNullReferenceLeft_AllowsNull()
+        {
+            var either = Either<string, int>.Of(0);
+
+            Assert.True(!either.IsLeft); // is right
+            Assert.Null(either.LeftRawValue);
+        }
+
+        [Fact]
+        public void Of_WithNullReferenceRight_AllowsNull()
+        {
+            var either = Either<string, int?>.Of(""); // right needs to be a nullable, primitive int defaults to 0
+
+            Assert.True(either.IsLeft); // is left
+            Assert.Null(either.RightRawValue);
+        }
+
+        [Fact]
+        public void Dispose_DoesNotThrow()
+        {
+            var either = Either<string, int>.Of("test");
+            var exception = Record.Exception(() => either.Dispose());
+
+            Assert.Null(exception);
+        }
+
+        [Fact]
+        public void Dispose_CanBeCalledMultipleTimes()
+        {
+            var either = Either<string, int>.Of(42);
+
+            either.Dispose();
+            either.Dispose(); // Should not throw
+        }
+
+        [Fact]
+        public void Either_WithDifferentTypes_Works()
+        {
+            var eitherInt = Either<string, int>.Of(10);
+            var eitherBool = Either<string, bool>.Of(true);
+            Assert.Equal(10, eitherInt.Right);
+            Assert.True(eitherBool.Right);
         }
     }
 }

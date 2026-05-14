@@ -27,9 +27,22 @@ ZeroNull brings **functional control-flow patterns** to C#. It provides lightwei
 
 | Type | Purpose | Key methods |
 | :--- | :--- | :--- |
-| `Option<T>` | A value that may be present (`Some`) or absent (`None`). | `Map`, `Bind`, `Match`, `ValueOr`, LINQ support |
-| `Result<T, TError>` | A value that is either successful (`Ok`) or carries an error (`Error`). | `Map`, `Bind`, `MapError`, `Match`, LINQ support |
-| `Either<TLeft, TRight>` | A value that is one of two possible types (e.g., `Left` or `Right`). | `MapLeft`, `MapRight`, `BindLeft`, `BindRight`, `Match`, LINQ support |
+| `Option<T>` | A value that may be present (`Some`) or absent (`None`). | `Map`, `Bind`, `Match`, `ValueOr`, LINQ support (`Select`, `SelectMany`) |
+| `Result<T, TError>` | A value that is either successful (`Ok`) or carries an error (`Error`). | `Map`, `Bind`, `MapError`, `Match`, LINQ support (`Select`, `SelectMany`) |
+| `Either<TLeft, TRight>` | A value that can be one of two possible types. By convention, `Left` represents failure/alternative, `Right` represents success. | `IsLeft`, `IsRight`, `Left`, `Right`, `Match`<br/><br/>**Extension methods:**<br/>• `Select` / `SelectMany` – LINQ query syntax support (works on the `Right` side)<br/>• `Where` – filter `Right` (with custom `Left` on false) or filter `Left`<br/>• `MapLeft` / `MapRight` – transform one side while keeping the other<br/>• `BindLeft` / `BindRight` – bind over one side to produce a new `Either` |
+
+### Either‑specific extension method details
+
+| Method | Description |
+| :--- | :--- |
+| `Select(selector)` | Projects the `Right` value when the `Either` is in the `Right` state. Enables LINQ query syntax. |
+| `SelectMany(binder, projector)` | Chains two `Either` operations that work on `Right` values. Short‑circuits on the first `Left`. |
+| `Where(predicate, leftOnFalse)` | Filters the `Right` value; if the predicate fails, becomes `Left(leftOnFalse)`. |
+| `Where(leftPredicate, leftOnFalse)` | Filters the `Left` value; if the predicate fails, becomes `Left(leftOnFalse)`. |
+| `MapLeft(mapper)` | Applies `mapper` to the `Left` value if present; otherwise preserves the `Right`. |
+| `MapRight(mapper)` | Applies `mapper` to the `Right` value if present; otherwise preserves the `Left`. |
+| `BindLeft(binder)` | If `Left`, applies `binder` to produce a new `Either` (can change `Left` type, or even become `Right`). |
+| `BindRight(binder)` | If `Right`, applies `binder` to produce a new `Either` (can change `Right` type, or even become `Left`). |
 
 **Core features:**
 - Immutable, `readonly struct` – zero heap allocation in hot paths.

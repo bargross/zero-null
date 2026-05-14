@@ -37,6 +37,9 @@ namespace ZeroNull.Types.Either.Root
             }
         }
 
+        public TLeft RawLeft => _left;
+        public TRight RawRight => _right;
+
         public Type LeftType => typeof(TLeft);
         public Type RightType => typeof(TRight);
 
