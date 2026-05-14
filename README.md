@@ -1,8 +1,6 @@
 ﻿# ZeroNull
 
 **Explicit, composable control flow for C#**
-
- (not yet released)
  
 [![NuGet](https://img.shields.io/nuget/v/ZeroNull)](https://www.nuget.org/packages/ZeroNull)
 
